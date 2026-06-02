@@ -1,27 +1,27 @@
 EzSmb
 ====
 
-SMB(Windows shared folder) Client Library powered by [TalAloni's SmbLibrary](https://github.com/TalAloni/SMBLibrary), Xamarin & .NET Core Ready.  
+SMB(Windows shared folder) Client Library powered by [TalAloni's SmbLibrary](https://github.com/TalAloni/SMBLibrary), Xamarin & .NET Core Ready.
 
-[![NuGet](https://img.shields.io/nuget/v/EzSmb.svg?label=NuGet)](https://www.nuget.org/packages/EzSmb/)
+[![NuGet](https://img.shields.io/nuget/v/EzSmb.Next.svg?label=NuGet)](https://www.nuget.org/packages/EzSmb.Next)
 
 ## Description
 
-It's easy to use, and supports SMB ver2 for Windows 10.  
-Xamarin & .NET Core can access Windows Shared Folders and NAS without using mpr.dll or Netapi32.dll.  
-Supports .Net Standard 2.0.  
+It's easy to use, and supports SMB ver2 for Windows 10.
+Xamarin & .NET Core can access Windows Shared Folders and NAS without using mpr.dll or Netapi32.dll.
+Supports .Net Standard 2.0.
 
 ## Requirement
 
-[SMBLibrary.ForXamarin](https://www.nuget.org/packages/SMBLibrary.ForXamarin/) >= 1.4.6.1  
+[SMBLibrary.ForXamarin](https://www.nuget.org/packages/SMBLibrary.ForXamarin/) >= 1.4.6.1
 [NETStandard.Library](https://www.nuget.org/packages/NETStandard.Library/) >= 2.0.3
 
-## Usage  
+## Usage
 
-[Add NuGet Package](https://www.nuget.org/packages/EzSmb/) to your project.
+[Add NuGet Package](https://www.nuget.org/packages/EzSmb.Next/) to your project.
 
 ```
-PM> Install-Package EzSmb
+PM> Install-Package EzSmb.Next
 ```
 
 and write code like this:
@@ -47,7 +47,7 @@ foreach (var node in nodes)
 //using EzSmb;
 //using System;
 //using System.Text;
-    
+
 // Get file Node.
 var file = await Node.GetNode(@"192.168.0.1\ShareName\FolderName\FileName.txt", "userName", "password");
 
@@ -59,7 +59,7 @@ using (var stream = await file.Read())
 }
 ```
 
-and more:  
+and more:
 - [Create new folder/file](https://github.com/ume05rw/EzSmb/blob/master/Examples.md#create-new-folderfile)
 - [Move folder/file](https://github.com/ume05rw/EzSmb/blob/master/Examples.md#move-folderfile)
 - [Delete folder/file](https://github.com/ume05rw/EzSmb/blob/master/Examples.md#delete-folderfile)
@@ -87,9 +87,9 @@ Node.GetList(string filter = "*", string relatedPath = null)
 [Do-Be's](http://dobes.jp)
 
 ## Contributors
-[upcu](https://github.com/upcu)  
-[synmra](https://github.com/synmra)  
-[icnocop](https://github.com/icnocop)  
+[upcu](https://github.com/upcu)
+[synmra](https://github.com/synmra)
+[icnocop](https://github.com/icnocop)
 [DenisKrasakovSDV](https://github.com/DenisKrasakovSDV)
 
 
@@ -97,6 +97,6 @@ Node.GetList(string filter = "*", string relatedPath = null)
 
 ## Links
 
-GitHub - TalAloni/SMBLibrary: SMB client & server implements.  
+GitHub - TalAloni/SMBLibrary: SMB client & server implements.
 [https://github.com/TalAloni/SMBLibrary](https://github.com/TalAloni/SMBLibrary)
 

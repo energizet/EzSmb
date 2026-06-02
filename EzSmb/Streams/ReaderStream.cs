@@ -253,71 +253,69 @@ namespace EzSmb.Streams
             if (count < 0)
                 throw new ArgumentOutOfRangeException("count");
 
-            var canceller = new CancellationTokenSource();
-            if (0 < this.ReadTimeout)
+            using (var canceller = new CancellationTokenSource())
             {
-                Task.Delay(this.ReadTimeout)
-                    .ContinueWith(t =>
-                    {
-                        canceller.Cancel();
-                    })
-                    .ConfigureAwait(false);
-            }
-
-            return this._locker.LockedInvoke<int>(() =>
-            {
-                if (this.IsUseCache)
+                if (0 < this.ReadTimeout)
                 {
-                    long initialPosition = this._position;
+                    canceller.CancelAfter(this.ReadTimeout);
+                }
 
-                    var cacheSet = this._cache.GetCacheSet(initialPosition, count);
-                    if (cacheSet.Ramainings.Count <= 0)
+                return this._locker.LockedInvoke<int>(() =>
+                {
+                    if (this.IsUseCache)
                     {
-                        // All the data had been cached.
+                        long initialPosition = this._position;
+
+                        var cacheSet = this._cache.GetCacheSet(initialPosition, count);
+                        if (cacheSet.Ramainings.Count <= 0)
+                        {
+                            // All the data had been cached.
+                            cacheSet.Cache.ToArray().CopyTo(buffer, offset);
+                            this._position = initialPosition + count;
+
+                            return (int)cacheSet.Cache.Length;
+                        }
+
+                        var index = 0;
+                        foreach (var range in cacheSet.Ramainings)
+                        {
+                            var partialBuffer = new byte[range.Count];
+                            this._position = range.Position;
+
+                            canceller.Token.ThrowIfCancellationRequested();
+
+                            var readed = this.InnerRead(
+                                partialBuffer,
+                                0,
+                                (int)range.Count,
+                                canceller.Token
+                            );
+
+                            if (
+                                (readed < range.Count)
+                                && ((range.Position + range.Count) < this.Length)
+                            )
+                            {
+                                throw new IOException(
+                                    "*** File Reading Failed with ReaderStream.IsUseCache = true ***");
+                            }
+
+                            cacheSet.Cache.Position = range.Position - initialPosition;
+                            cacheSet.Cache.Write(partialBuffer, 0, readed);
+                            this._position = range.Position + readed;
+                            index++;
+                        }
+
                         cacheSet.Cache.ToArray().CopyTo(buffer, offset);
-                        this._position = initialPosition + count;
 
                         return (int)cacheSet.Cache.Length;
                     }
-
-                    var index = 0;
-                    foreach (var range in cacheSet.Ramainings)
+                    else
                     {
-                        var partialBuffer = new byte[range.Count];
-                        this._position = range.Position;
-
-                        canceller.Token.ThrowIfCancellationRequested();
-
-                        var readed = this.InnerRead(
-                            partialBuffer,
-                            0,
-                            (int)range.Count,
-                            canceller.Token
-                        );
-
-                        if (
-                            (readed < range.Count)
-                            && ((range.Position + range.Count) < this.Length)
-                        )
-                        {
-                            throw new IOException("*** File Reading Failed with ReaderStream.IsUseCache = true ***");
-                        }
-
-                        cacheSet.Cache.Position = range.Position - initialPosition;
-                        cacheSet.Cache.Write(partialBuffer, 0, readed);
-                        this._position = range.Position + readed;
-                        index++;
+                        return this.InnerRead(buffer, offset, count, canceller.Token);
                     }
-
-                    cacheSet.Cache.ToArray().CopyTo(buffer, offset);
-
-                    return (int)cacheSet.Cache.Length;
-                }
-                else
-                {
-                    return this.InnerRead(buffer, offset, count, canceller.Token);
-                }
-            });
+                });
+            }
         }
 
         private int InnerRead(

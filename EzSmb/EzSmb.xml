@@ -728,6 +728,11 @@
             Handle created flag
             </summary>
         </member>
+        <member name="P:EzSmb.Transports.Shares.Handlers.Interfaces.IHandler.Status">
+            <summary>
+            NTStatus of creating the Handle
+            </summary>
+        </member>
         <member name="T:EzSmb.Transports.Shares.Handlers.Smb1Handler">
             <summary>
             Handle object manager for SMB1
